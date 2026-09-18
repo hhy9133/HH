@@ -1,0 +1,31 @@
+{
+  "C_Cpp.errorSquiggles": "enabled",
+
+  // ---- Code Runner ----
+  // 调用 clrun.bat：它内部先 call vcvars64.bat，再用 cl.exe 编译并运行。
+  //
+  // 这条命令踩过两个坑，都写在这里免得以后再犯：
+  //
+  // 坑 1：$fullFileName 两边【不要】自己加引号。
+  //   Code Runner 的 codeManager.js 里是
+  //       { regex: /\$fullFileName/g, replaceValue: this.quoteFileName(...) }
+  //   而 quoteFileName() 无条件返回 '"' + fileName + '"'。
+  //   再套一层就变成 ""路径""，解析直接失败。
+  //
+  // 坑 2：clrun.bat 的路径【不要】加引号。
+  //   PowerShell 里以引号开头的东西是「表达式」而不是「命令」，
+  //   所以  "D:\Apps\clrun.bat" "参数"  会被报
+  //   "表达式或语句中包含意外的标记"。要么加调用运算符 &，要么不加引号。
+  //   这里选不加引号——D:\Apps\clrun.bat 本身没有空格，
+  //   而且这种写法在 PowerShell、cmd、以及非终端 exec 模式下都成立。
+  //
+  // 另外刻意不写 cd / &&：Code Runner 可能把命令交给不同 shell，
+  // 只有单条命令在各处都成立。工作目录由 clrun.bat 自己切换。
+  "code-runner.runInTerminal": true,
+  "code-runner.executorMap": {
+    "c": "D:\\Apps\\clrun.bat $fullFileName",
+    "cpp": "D:\\Apps\\clrun.bat $fullFileName"
+  },
+  "code-runner.clearPreviousOutput": true,
+  "code-runner.saveFileBeforeRun": true
+}

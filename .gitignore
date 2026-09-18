@@ -1,0 +1,18 @@
+# ===== 编译产物（MSVC）=====
+# 这些是 cl.exe 每次编译生成的中间文件和可执行文件，
+# 体积很大（这里加起来约 40 MB）而且完全可以从源码重新生成，
+# 所以不应该进版本库。
+*.exe
+*.obj
+*.o
+*.ilk
+*.pdb
+*.idb
+*.exp
+*.lib
+
+# ===== Code Runner / VS Code =====
+# Code Runner 的临时文件，每次运行都会重建
+tempCodeRunnerFile.cpp
+# 我改配置前留的备份目录，不属于项目源码
+.vscode/backup-*/

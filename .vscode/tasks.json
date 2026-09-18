@@ -1,0 +1,39 @@
+{
+  // 用 MSVC (cl.exe) 编译当前打开的文件。按 Ctrl+Shift+B 执行。
+  //
+  // 关键点：cl.exe 必须先由 vcvars64.bat 设置好 INCLUDE / LIB / PATH 才能用，
+  // 所以这里用 cmd 先 call 那个脚本，再用 && 接上编译命令。
+  //
+  // 字符集用 /source-charset:utf-8，【不要】用简写 /utf-8：
+  //   - MSVC 默认按系统代码页(936/GBK)读源文件，无 BOM 的 UTF-8 源码里若有
+  //     中文字符串字面量，会报 "error C2001: 常量中有换行符"
+  //       -> 所以必须指定 /source-charset:utf-8
+  //   - 但 /utf-8 等于 /source-charset:utf-8 + /execution-charset:utf-8，
+  //     后半截会让字符串按 UTF-8 字节生成，而控制台是 936，
+  //     于是中文输出变乱码（今年是闰年 -> 翠林饗存櫥闆板勾）
+  //   - 保留执行字符集为系统默认(GBK)，控制台才显示正确的中文
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "C/C++: cl.exe 生成活动文件 (MSVC)",
+      "type": "shell",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "\"D:\\Apps\\VS2022BuildTools\\VC\\Auxiliary\\Build\\vcvars64.bat\" >nul 2>&1 && cl /nologo /W4 /Zi /EHsc /std:c++17 /source-charset:utf-8 /D_CRT_SECURE_NO_WARNINGS \"${file}\" /Fe:\"${fileDirname}\\${fileBasenameNoExtension}.exe\""
+      ],
+      "options": {
+        "cwd": "${fileDirname}"
+      },
+      // $msCompile 是 MSVC 的报错解析器：编译错误会出现在「问题」面板，点击可跳到出错行
+      "problemMatcher": [
+        "$msCompile"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "detail": "MSVC cl.exe 19.44 (通过 vcvars64.bat 注入环境)"
+    }
+  ]
+}
