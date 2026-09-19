@@ -1,17 +1,13 @@
 {
-  // 用 MSVC (cl.exe) 编译当前打开的文件。按 Ctrl+Shift+B 执行。
+  // 按 Ctrl+Shift+B 编译当前文件。
   //
-  // 关键点：cl.exe 必须先由 vcvars64.bat 设置好 INCLUDE / LIB / PATH 才能用，
-  // 所以这里用 cmd 先 call 那个脚本，再用 && 接上编译命令。
+  // 只用这一个任务：MSVC 的 cl.exe。
+  // 不要添加指向 D:\msys64 的 gcc/g++ 任务 —— Smart App Control 拦掉了
+  // msys64 的汇编器 as.exe，那些编译器已经完全不可用。
   //
-  // 字符集用 /source-charset:utf-8，【不要】用简写 /utf-8：
-  //   - MSVC 默认按系统代码页(936/GBK)读源文件，无 BOM 的 UTF-8 源码里若有
-  //     中文字符串字面量，会报 "error C2001: 常量中有换行符"
-  //       -> 所以必须指定 /source-charset:utf-8
-  //   - 但 /utf-8 等于 /source-charset:utf-8 + /execution-charset:utf-8，
-  //     后半截会让字符串按 UTF-8 字节生成，而控制台是 936，
-  //     于是中文输出变乱码（今年是闰年 -> 翠林饗存櫥闆板勾）
-  //   - 保留执行字符集为系统默认(GBK)，控制台才显示正确的中文
+  // /source-charset:utf-8 不能省，也不能换成简写 /utf-8：
+  //   前者只让 MSVC 按 UTF-8 读源码（中文能编译过），
+  //   后者还会把字符串按 UTF-8 生成，而控制台是 GBK —— 中文输出会变乱码。
   "version": "2.0.0",
   "tasks": [
     {
@@ -25,7 +21,6 @@
       "options": {
         "cwd": "${fileDirname}"
       },
-      // $msCompile 是 MSVC 的报错解析器：编译错误会出现在「问题」面板，点击可跳到出错行
       "problemMatcher": [
         "$msCompile"
       ],
@@ -33,7 +28,7 @@
         "kind": "build",
         "isDefault": true
       },
-      "detail": "MSVC cl.exe 19.44 (通过 vcvars64.bat 注入环境)"
+      "detail": "MSVC cl.exe 19.44（通过 vcvars64.bat 注入环境）"
     }
   ]
 }
